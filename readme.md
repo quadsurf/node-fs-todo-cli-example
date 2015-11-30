@@ -10,8 +10,6 @@ There two types of examples, the one on the master branch is more complex.
 
 **A simpler example exist on a different branch.**
 
-
-
 ## Exercise Objectives
 
 - Build a to-do list app that creates new files in `.json` format
