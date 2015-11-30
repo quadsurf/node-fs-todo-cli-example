@@ -1,0 +1,23 @@
+{
+  "name": "node-todo-cli",
+  "version": "1.0.0",
+  "description": "Example exercise to show how Node FS Module works",
+  "main": "app.js",
+  "dependencies": {
+    "prompt": "^0.2.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gSchool/node-fs-todo-cli-example.git"
+  },
+  "author": "Zubair Desai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gSchool/node-fs-todo-cli-example/issues"
+  },
+  "homepage": "https://github.com/gSchool/node-fs-todo-cli-example#readme"
+}
