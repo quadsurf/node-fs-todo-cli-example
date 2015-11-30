@@ -6,6 +6,12 @@ Each todo list will be file that our app will create, such as `mondayTodos.json`
 
 In each file, there will be a list of tasks that we can read, update, mark as complete, or delete.
 
+There two types of examples, the one on the master branch is more complex.
+
+**A simpler example exist on a different branch.**
+
+
+
 ## Exercise Objectives
 
 - Build a to-do list app that creates new files in `.json` format
