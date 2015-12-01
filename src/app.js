@@ -1,11 +1,12 @@
-var prompt = require('prompt');
-var TodoList = require('./todoList');
+var prompt = require('prompt');       // npm module, how do we know?
+var TodoList = require('./todoList'); // file module, how do we know?
 
 TodoList.init()
 
 console.log("Welcome to Command Line Todo!");
 prompt.start();
 
+// These are the things we can do
 var options = {
   1: "addItem",
   2: "toggleItem",
@@ -30,8 +31,8 @@ runOption = {
           homePrompt();
         });
 
-      })
-    })
+      });
+    });
   },
 
   toggleItem: function(){
@@ -45,10 +46,10 @@ runOption = {
 
         TodoList.toggleItem(result.taskNumber, function(){
           homePrompt();
-        })
+        });
 
-      })
-    })
+      });
+    });
   },
 
   listItems: function(){
@@ -69,10 +70,10 @@ runOption = {
 
         TodoList.removeItem(result.taskNumber, function(){
           homePrompt();
-        })
+        });
 
-      })
-    })
+      });
+    });
   }
 }
 
@@ -86,6 +87,11 @@ function showMenu(){
   console.log("***********HOME**************");
 }
 
+/**
+ * This function is commonly used as a callback. We do this so that we can
+ * show the home screen prompt after an asyc callback (which is how we must
+ * fetch data using the fs module).
+ */
 function homePrompt(){
   showMenu();
 
@@ -105,9 +111,12 @@ function homePrompt(){
       runOption[userSelection]();
     }
 
-  })
+  });
 }
 
+/**
+ * This function takes a list of tasks and displays them nicely in the CLI.
+ */
 function showTasks(tasksToShow){
   console.log("________LIST ITEMS___________ \n");
   if (tasksToShow.length === 0) {
