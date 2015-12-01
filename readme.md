@@ -1,21 +1,19 @@
 # Node File IO Example: Creating A To Do List
 
-In this example, we're creating a to-do list app that will work in the command line.  We want to be able to create new to-do lists each with tasks, and be able to add new tasks and mark existing tasks as complete.  We also want the ability to delete any tasks.
+In this example, we're creating a to-do list app that will work in the command line. In the basic version we only want to maintain one todo list. We must be able to:
 
-Each todo list will be file that our app will create, such as `mondayTodos.json`.
+1. Add new tasks to the list
+2. Delete tasks from the list
+3. Mark existing tasks as complete
+4. Unmark a task as complete
 
-In each file, there will be a list of tasks that we can read, update, mark as complete, or delete.
+On the master branch, there is a more complex example where we can maintain several todo lists.
 
-There two types of examples, the one on the master branch is more complex.
+## Exercise Objectives, Simple Version
 
-**A simpler example exist on a different branch.**
-
-## Exercise Objectives
-
-- Build a to-do list app that creates new files in `.json` format
-- Each file is its own to-do list
-- Inside each to do list are tasks added from our app.
-- We should be able to read each to-do list file and add, update, or delete tasks within.
+- Build a to-do list app that modifies an existing `.json` file
+- Inside the todo list are tasks added from our app.
+- We should be able to read the todo list file and add, update, or delete tasks within.
 
 ## Educational Objectives
 
