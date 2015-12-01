@@ -1,132 +1,78 @@
 var prompt = require('prompt');
 var TodoList = require('./todoList');
 
-TodoList.init();
+TodoList.init()
 
 console.log("Welcome to Command Line Todo!");
 prompt.start();
 
 var options = {
-  1: "new",
-  2: "edit",
-  3: "list",
-  4: "delete",
-}
-
-var editOptions = {
-  1: "updateDescription",
-  2: "markComplete",
-  3: "addTask",
-  4: "changeName",
-  5: "home"
+  1: "addItem",
+  2: "toggleItem",
+  3: "listItems",
+  4: "removeItem",
 }
 
 homePrompt();
 
 runOption = {
-  new: function(){
 
-    showList(function(){
-      console.log("Enter a name for this new to-do, and a filename \n");
+  addItem: function(){
+    TodoList.list(function(tasks){
+      showTasks(tasks)
 
-      prompt.get(['name', 'filename', 'description'], function (err, result) {
+      console.log(">>>>>>>>>>>>>ADD ITEM>>>>>>>>>>>>>>>>>>");
+      console.log("Enter a description for the new item you would like to add: \n");
 
-        TodoList.init(result.name, result.filename, result.description);
+      prompt.get(['description'], function (err, result) {
 
-        TodoList.create(function(){
-          homePrompt()
+        TodoList.addItem(result.description, function(){
+          homePrompt();
         });
 
       })
-    });
-
+    })
   },
 
-  edit: function(){
-    showList(function(){
+  toggleItem: function(){
+    TodoList.list(function(tasks){
+      showTasks(tasks)
 
-      prompt.get(['name'], function (err, result) {
+      console.log(">>>>>>>>>>>>>TOGGLE ITEM>>>>>>>>>>>>>>>>>>");
+      console.log("Enter the task number for the task you would like to toggle \n");
 
-      console.log("Enter the name for the to-do you want to edit \n");
-        var todoName = result.name;
-        TodoList.edit(todoName, function(data){
-          editPrompt(data);
+      prompt.get(['taskNumber'], function (err, result) {
+
+        TodoList.toggleItem(result.taskNumber, function(){
+          homePrompt();
         })
+
       })
-
-    });
-
+    })
   },
 
-  list: function(){
-    showList(function(){
+  listItems: function(){
+    TodoList.list(function(tasks){
+      showTasks(tasks)
       homePrompt();
     })
   },
 
-  delete: function(){
-    showList(function(){
-      console.log("Enter the name for the to-do you want to delete \n");
+  removeItem: function(){
+    TodoList.list(function(tasks){
+      showTasks(tasks)
 
-      prompt.get(['name'], function (err, result) {
-        var todoName = result.name;
-        TodoList.delete(todoName, function(){
+      console.log(">>>>>>>>>>>>>REMOVE ITEM>>>>>>>>>>>>>>>>>>");
+      console.log("Enter the task number for the task you would like to remove \n");
+
+      prompt.get(['taskNumber'], function (err, result) {
+
+        TodoList.removeItem(result.taskNumber, function(){
           homePrompt();
         })
+
       })
-    });
-  }
-}
-
-var runEditOption = {
-  updateDescription: function(data){
-    console.log("Enter a new description");
-    prompt.get(['description'], function (err, result) {
-      var content = result.description;
-
-      TodoList.updateDetails(data,'description', content, function(info){
-        editPrompt(info)
-      })
-
     })
-  },
-
-  markComplete: function(data){
-    console.log("Marked Completed!");
-
-    TodoList.updateDetails(data,'completed', true, function(info){
-      editPrompt(info)
-    })
-
-  },
-
-  addTask: function(data){
-    console.log("Enter a new task");
-
-    prompt.get(['task'], function (err, result) {
-      var content = result.task;
-
-      TodoList.addTask(data, content, function(info){
-        editPrompt(info)
-      })
-
-    })
-  },
-
-  changeName: function(data){
-    console.log("Enter a new name");
-    prompt.get(['name'], function (err, result) {
-      var content = result.name;
-
-      TodoList.updateDetails(data,'name', content, function(info){
-        editPrompt(info)
-      })
-
-    })
-  },
-
-  home: function(data){
-    homePrompt();
   }
 }
 
@@ -162,47 +108,14 @@ function homePrompt(){
   })
 }
 
-function showEditMenu(){
-  console.log("**********EDIT***************");
-  console.log("OPTIONS FOR EDITING:");
-  console.log("Please enter 1 - 4");
-  Object.keys(editOptions).forEach(function(option){
-    console.log(option, " - ", editOptions[option]);
-  });
-  console.log("**********EDIT***************");
-}
-
-function editPrompt(data){
-  showEditMenu();
-
-  prompt.get(['option'], function (err, result) {
-
-    if (err) {
-      console.log(err);
-      return 1;
+function showTasks(tasksToShow){
+  console.log("________LIST ITEMS___________ \n");
+  if (tasksToShow.length === 0) {
+    console.log("NONE");
+  } else {
+    for (var i = 0; i < tasksToShow.length; i++) {
+      // start numbering from 1
+      console.log(i + ':', tasksToShow[i].description, '| completed: ' + tasksToShow[i].completed + "\n");
     }
-
-    if (!editOptions.hasOwnProperty(result.option) ) {
-      // not a valid option
-      console.error( 'please try again with 1 - 4');
-    } else {
-      console.log('\n You selected:', editOptions[result.option], "\n");
-      var userSelection = editOptions[result.option]
-      runEditOption[userSelection](data);
-    }
-
-  })
-}
-
-function showList( next ){
-  return TodoList.all(function(){
-    todos = JSON.parse(TodoList.list)
-    console.log("***********TODOS**************");
-    for (var item in todos) {
-      console.log("To-do: ", item, " Filename: ", todos[item], "\n");
-    }
-    console.log("***********TODOS**************");
-
-    next()
-  });
+  }
 }

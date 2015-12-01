@@ -3,256 +3,137 @@ var fs = require('fs');
 
 var TodoList = {
 
-  init: function(name, filename, description){
+  init: function(){
 
-    // if they are all blank, just set the todosFile propery
-    if (name || filename || description) {
-      this.name = name;
-      this.filename = filename + '.json';
-      this.description = description;
-    }
+    // creates a full filepath for a given string
+    this.todoFilePath = createFilePathFor("myTodo.json")
 
-    this.todosFile = getFilePathFor('todos.json')
-  },
-
-  all: function(next){
-    fs.readFile(TodoList.todosFile, 'utf8', function(err, data){
-
-      TodoList.list = data;
-
-
-      if (next) {
-        next();
-      }
-
-    })
-  },
-
-  create: function (next) {
-    var todoName = this.name;
-    var filename = this.filename;
-    var description = this.description;
-
-    ifFileDoesNotExist(filename, todoName, function(pathOfFile, nameOfTodo) {
-      var content = {
-        name: todoName,
-        filename: filename,
-        description: description,
-        completed: false,
-        tasks: []
-      };
-
-      var newContent = JSON.stringify(content)
-
-      // create new file
-      fs.writeFile(pathOfFile, newContent , function(err){
-        if (err) {
-          console.error(err);
-        }
-        console.log("\n >>>>>>> New To Do List Created! <<<<<<< \n ");
-        console.log("\n Find me at: ", pathOfFile, "\n");
-
-        addToTodos(filename, todoName);
-
-        if (next) {
-          next();
-        }
-      })
-    })
-  },
-
-  edit: function( nameOfTodo, next){
-
-    this.all(function(){
-
-      list = JSON.parse(TodoList.list)
-
-      if (todoNameIsNotInList(list, nameOfTodo)) {
-        console.error('That to-do name could not be found');
-      } else {
-        todo = getFilePathFor(list[nameOfTodo])
-        fs.readFile(todo,'utf8', function(err,data){
-          console.log(data);
-
-          if (next) {
-            next(data);
-          }
-
+    // see if myTodo.json tasks are empty
+    tasksStatus(this.todoFilePath, function(status, filepath){
+      if (status === 'empty') {
+        fs.writeFile(filepath, '{"name": "myTodo" ,"tasks":[]}', function(err){
+          if(err) console.log(err);
         })
       }
+    })
 
+  },
+
+  list: function(callback){
+    // read myTodo.json
+    fs.readFile(TodoList.todoFilePath, 'utf8', function(err,data){
+      var tasks = JSON.parse(data).tasks;
+      var todo = JSON.parse(data);
+      callback(tasks, todo);
     })
   },
 
-  delete: function(nameOfTodo, next) {
+  addItem: function(itemDesc, callback){
 
-    fs.readFile(TodoList.todosFile, 'utf8', function(err, data){
-      todos = JSON.parse(data);
+    fs.readFile(TodoList.todoFilePath, 'utf8', function(err,data){
 
-      console.log("\n Deleting ", nameOfTodo );
+      // save what we already have in myTodo.json
+      var currentData = JSON.parse(data);
 
-      // delete file itself
-      todoFile =  getFilePathFor(todos[nameOfTodo])
+      // add the new task
+      currentData.tasks.push({description: itemDesc, completed: false})
+      var newData = JSON.stringify(currentData);
 
-      fs.unlink(todoFile, function (err) {
-          if (err) {
-            console.error(err);
-          }
-        console.log('successfully deleted todo');
-      });
+      // update myTodo.json with the changed tasks list
+      fs.writeFile(TodoList.todoFilePath, newData, function(err){
+        if(err) console.error(err);
 
-      // Delete from todos.json
-      delete todos[nameOfTodo]
+        console.log("wrote ", newData, " to ", TodoList.todoFilePath );
 
-      todos = JSON.stringify(todos);
-
-      fs.writeFile(TodoList.todosFile, todos, function(err){
-        if (err) {
-          console.error(err);
-        }
+        if(callback) callback();
       })
 
-      // go to next prompt
-      next()
-
     })
 
   },
 
-  updateDetails: function(todoData, detail, contentToUpdate, next) {
-    var todo = JSON.parse(todoData);
-    var filepath = getFilePathFor(todo.filename);
+  toggleItem: function(itemNumber, callback){
+    TodoList.list(function(tasks, todo){
 
-    fs.readFile(filepath,'utf8', function(err,data){
+      if (tasks[itemNumber] !== undefined) {
+        console.log('Updating task');
+        // get the completed status
+        var completedStatus = tasks[itemNumber].completed
 
-      if (err) {
-        console.error(err);
+        // toggle it, by making it equal to the opposite
+        tasks[itemNumber].completed = !completedStatus
+
+      } else {
+        console.log('Task number was not valid');
       }
 
-      // Parse the todo list, update, turn back to string
-      var content = JSON.parse(data);
-      content[detail] = contentToUpdate;
-      newContent = JSON.stringify(content);
+      // update todo list
+      todo.tasks = tasks;
+      var updatedTodo = JSON.stringify(todo);
 
-      fs.writeFile(filepath, newContent,function(err){
-        if (err) {
-          console.error(err);
-        }
-        console.log("\n >>>>>>> Content Updated! <<<<<<< \n ");
-        next(todoData);
+      // update myTodo.json with the changed tasks list
+      fs.writeFile(TodoList.todoFilePath, updatedTodo, function(err){
+        if(err) console.error(err);
+
+        if(callback) callback();
       })
+
     })
   },
 
-  addTask: function(todoData, taskContent, next) {
-    var todo = JSON.parse(todoData);
-    var filepath = getFilePathFor(todo.filename);
+  removeItem: function(itemNumber, callback){
+    TodoList.list(function(tasks, todo){
 
-    var newTask = {
-      description: taskContent,
-      completed: false
-    }
-
-    fs.readFile(filepath,'utf8', function(err,data) {
-
-      if (err) {
-        console.error(err);
+      // remove task from todo if that task number is valid
+      if (todo.tasks[itemNumber] !== undefined) {
+        console.log('Removing task');
+        todo.tasks.splice(itemNumber,1);
+      } else {
+        console.log('Task number was not valid');
       }
 
-      // Parse the todo list, update, turn back to string
-      var content = JSON.parse(data);
-      content.tasks.push(newTask);
-      newContent = JSON.stringify(content);
+      var updatedTodo = JSON.stringify(todo);
 
-      fs.writeFile(filepath, newContent,function(err){
-        if (err) {
-          console.error(err);
-        }
-        console.log("\n >>>>>>> New Task Added! <<<<<<< \n ");
-        next(todoData);
+      // update myTodo.json with the changed tasks list
+      fs.writeFile(TodoList.todoFilePath, updatedTodo, function(err){
+        if(err) console.error(err);
+
+        if(callback) callback();
       })
+
     })
   }
-
 }
 
-function ifFileDoesNotExist(filename, nameOfTodo, fn) {
-  var filePath = TodoList.todosFile;
-
-  fs.readFile(filePath, 'utf8',function(err,data) {
-
-    if (err) {
-      console.error(err);
-    }
-
-    if (data === '') {
-      var todos = {};
-    } else{
-      var todos = JSON.parse(data);
-    }
-
-    var duplicateFilename = false;
-    var duplicateTodoName = !todoNameIsNotInList(todos, nameOfTodo);
-
-    Object.keys(todos).forEach(function(name){
-      if (todos[name] === filename ) {
-        duplicateFilename = true;
-      }
-    })
-
-    if (duplicateFilename || duplicateTodoName) {
-
-      console.error('Duplication Found!');
-      console.error('Duplicate filename:', duplicateFilename );
-      console.error('Duplicate to-do name:', duplicateTodoName );
-
-    } else {
-
-      var pathOfFile = getFilePathFor(filename)
-      fn(pathOfFile, nameOfTodo)
-
-    }
-
-  })
-}
-
-function getFilePathFor(pathOfFile){
+function createFilePathFor(filename){
   var rootDir = __dirname.slice(0,__dirname.length - 3) + 'todo-lists/';
-  return rootDir + pathOfFile
+  return rootDir + filename
 }
 
-function addToTodos(nameOfFile, nameOfTodo){
-  var todos = TodoList.todosFile
+function tasksStatus(tasksFile, callback){
+  fs.readFile(tasksFile, 'utf8', function(err,data){
+    if(err) console.error(err);
 
-  fs.readFile(todos, 'utf8' ,function(err,data){
-    var newData;
+    var tasksData = null;
+    var status = null;
+    var tasks = null;
 
     if (data === '') {
-      console.log("data was empty!");
-      newData = {};
-      newData[nameOfTodo] = nameOfFile
+      status = 'empty';
     } else {
-      newData = JSON.parse(data);
-      newData[nameOfTodo] = nameOfFile;
+      tasks = JSON.parse(data).tasks
     }
 
-    var newTodosList = JSON.stringify(newData)
+    if(tasks === null) {
+      status = 'empty';
+    } else {
+      status = 'notEmpty'
+    }
 
-    fs.writeFile(todos, newTodosList, function(err){
-      if (err) {
-        console.error(err);
-      }
-    })
+    callback(status, tasksFile);
 
   })
 }
 
-function todoNameIsNotInList(listToCheck, nameToCheck){
-  if (listToCheck.hasOwnProperty(nameToCheck)) {
-    return false;
-  } else {
-    return true;
-  }
-}
 
 module.exports = TodoList;
