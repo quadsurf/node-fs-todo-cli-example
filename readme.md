@@ -7,7 +7,9 @@ In this example, we're creating a to-do list app that will work in the command l
 3. Mark existing tasks as complete
 4. Unmark a task as complete
 
-On the master branch, there is a more complex example where we can maintain several todo lists.
+A solution can be found on the branch `basic-example`.
+
+The `master` branch, has a more complex example where we can maintain several todo lists.
 
 ## Exercise Objectives, Simple Version
 

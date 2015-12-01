@@ -1,6 +1,7 @@
 var prompt = require('prompt');       // npm module, how do we know?
 var TodoList = require('./todoList'); // file module, how do we know?
 
+// initializes todo list file
 TodoList.init()
 
 console.log("Welcome to Command Line Todo!");
@@ -14,66 +15,46 @@ var options = {
   4: "removeItem",
 }
 
+// Show the options menu
 homePrompt();
 
+// run a function in the runOption object based on what number the user enters
 runOption = {
 
   addItem: function(){
-    TodoList.list(function(tasks){
-      showTasks(tasks)
+    // show any tasks that exist
 
-      console.log(">>>>>>>>>>>>>ADD ITEM>>>>>>>>>>>>>>>>>>");
-      console.log("Enter a description for the new item you would like to add: \n");
+    // Get user input for task description
 
-      prompt.get(['description'], function (err, result) {
+    // Run a method on TodoList that adds a task
 
-        TodoList.addItem(result.description, function(){
-          homePrompt();
-        });
-
-      });
-    });
+    // Go back to the home prompt after
   },
 
   toggleItem: function(){
-    TodoList.list(function(tasks){
-      showTasks(tasks)
+    // show any tasks that exist
 
-      console.log(">>>>>>>>>>>>>TOGGLE ITEM>>>>>>>>>>>>>>>>>>");
-      console.log("Enter the task number for the task you would like to toggle \n");
+    // Get user input for which task to toggle
 
-      prompt.get(['taskNumber'], function (err, result) {
+    // Run a method on TodoList that toggles the task complete as true/false
 
-        TodoList.toggleItem(result.taskNumber, function(){
-          homePrompt();
-        });
-
-      });
-    });
+    // Go back to the home prompt after
   },
 
   listItems: function(){
-    TodoList.list(function(tasks){
-      showTasks(tasks)
-      homePrompt();
-    })
+    // show any tasks that exist
+
+    // Go back to the home prompt after
   },
 
   removeItem: function(){
-    TodoList.list(function(tasks){
-      showTasks(tasks)
+    // show any tasks that exist
 
-      console.log(">>>>>>>>>>>>>REMOVE ITEM>>>>>>>>>>>>>>>>>>");
-      console.log("Enter the task number for the task you would like to remove \n");
+    // Get user input for task to remove
 
-      prompt.get(['taskNumber'], function (err, result) {
+    // Run a method on TodoList that removes the item
 
-        TodoList.removeItem(result.taskNumber, function(){
-          homePrompt();
-        });
-
-      });
-    });
+    // Go back to the home prompt after
   }
 }
 
@@ -112,19 +93,4 @@ function homePrompt(){
     }
 
   });
-}
-
-/**
- * This function takes a list of tasks and displays them nicely in the CLI.
- */
-function showTasks(tasksToShow){
-  console.log("________LIST ITEMS___________ \n");
-  if (tasksToShow.length === 0) {
-    console.log("NONE");
-  } else {
-    for (var i = 0; i < tasksToShow.length; i++) {
-      // start numbering from 1
-      console.log(i + ':', tasksToShow[i].description, '| completed: ' + tasksToShow[i].completed + "\n");
-    }
-  }
 }
