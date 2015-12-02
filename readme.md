@@ -30,3 +30,11 @@ Key topics in this example include:
 - Parsing files
 - Code structure and organization
 - Callbacks
+
+
+## Getting started
+
+- Clone to your local machine
+- In your local app folder, type `sudo npm install`
+- See what you have so far by running `node src/app.js`
+- Write your code in the files inside the src folder
